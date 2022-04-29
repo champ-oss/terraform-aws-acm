@@ -1,4 +1,4 @@
-module github.com/champtitles/terraform-aws-acm
+module github.com/champ-oss/terraform-aws-acm
 
 go 1.17
 
