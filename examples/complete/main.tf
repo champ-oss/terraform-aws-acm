@@ -28,7 +28,8 @@ module "with_validation" {
   source            = "../../"
   depends_on        = [aws_lb.this]
   git               = local.git
-  domain_name       = data.aws_route53_zone.this.name
+  domain_name       = "terraform-aws-acm.${data.aws_route53_zone.this.name}"
+  create_wildcard   = false
   zone_id           = data.aws_route53_zone.this.zone_id
   enable_validation = true
 }

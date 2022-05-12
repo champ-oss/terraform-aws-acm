@@ -7,7 +7,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
-	"strings"
 	"testing"
 )
 
@@ -29,9 +28,6 @@ func TestExamplesComplete(t *testing.T) {
 	cert := getCertificate(arn, region)
 	assert.Equal(t, "ISSUED", *cert.Certificate.Status)
 	assert.Equal(t, "SUCCESS", *cert.Certificate.DomainValidationOptions[0].ValidationStatus)
-
-	logger.Log(t, "Checking if the certificate is wildcard")
-	assert.True(t, strings.HasPrefix(*cert.Certificate.DomainName, "*."))
 }
 
 // getCertificate logs in to AWS and gets the details of an ACM certificate
