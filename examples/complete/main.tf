@@ -18,10 +18,11 @@ locals {
 }
 
 module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc?ref=v1.0.8-62f1b70"
+  source                   = "github.com/champ-oss/terraform-aws-vpc?ref=v1.0.9-ca0a300"
   git                      = local.git
   availability_zones_count = 2
   retention_in_days        = 1
+  create_private_subnets   = false
 }
 
 module "with_validation" {
@@ -50,11 +51,11 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_lb" "this" {
-  name_prefix     = "lb-pv-"
+  name_prefix     = "lb-pb-"
   security_groups = [aws_security_group.this.id]
-  subnets         = module.vpc.private_subnets_ids
+  subnets         = module.vpc.public_subnets_ids
   tags            = local.tags
-  internal        = true
+  internal        = false
 }
 
 resource "aws_lb_listener" "this" {
