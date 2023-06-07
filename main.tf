@@ -35,8 +35,14 @@ resource "aws_route53_record" "alias" {
   }
 }
 
+resource "aws_acm_certificate_validation" "alias" {
+  count                   = var.enable_validation && length(var.alias) > 0 ? 1 : 0
+  certificate_arn         = aws_acm_certificate.this.arn
+  validation_record_fqdns = [aws_route53_record.alias[0].fqdn]
+}
+
 resource "aws_acm_certificate_validation" "this" {
-  count                   = var.enable_validation ? 1 : 0
+  count                   = var.enable_validation && length(var.alias) == 0 ? 1 : 0
   certificate_arn         = aws_acm_certificate.this.arn
   validation_record_fqdns = [aws_route53_record.this[0].fqdn]
 }
