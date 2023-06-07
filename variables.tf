@@ -45,3 +45,9 @@ variable "time_sleep" {
   type        = number
   default     = 30
 }
+
+variable "alias" {
+  type        = map(any)
+  default     = {}
+  description = "An alias block. Conflicts with ttl & records. Alias record documented below."
+}
