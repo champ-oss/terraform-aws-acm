@@ -31,4 +31,8 @@ resource "aws_acm_certificate_validation" "this" {
 resource "time_sleep" "this" {
   depends_on      = [aws_acm_certificate_validation.this]
   create_duration = var.enable_validation ? "${var.time_sleep}s" : "0s"
+
+  triggers = {
+    certificate_arn = aws_acm_certificate.this.arn
+  }
 }
