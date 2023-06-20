@@ -45,3 +45,33 @@ variable "time_sleep" {
   type        = number
   default     = 30
 }
+
+variable "create_route53_alias_record" {
+  description = "create route53 alias record"
+  type        = bool
+  default     = false
+}
+
+variable "dns_domain_name" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record#name"
+  type        = string
+  default     = ""
+}
+
+variable "alias_name" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record#name"
+  type        = string
+  default     = ""
+}
+
+variable "alias_zone_id" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record#zone_id"
+  type        = string
+  default     = ""
+}
+
+variable "alias_evaluate_target_health" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record#evaluate_target_health"
+  type        = bool
+  default     = true
+}

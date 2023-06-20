@@ -22,6 +22,18 @@ resource "aws_route53_record" "this" {
   zone_id         = var.zone_id
 }
 
+resource "aws_route53_record" "alias" {
+  count   = var.create_route53_alias_record ? 1 : 0
+  name    = var.dns_domain_name
+  zone_id = var.zone_id
+  type    = "A"
+  alias {
+    name                   = var.alias_name
+    zone_id                = var.alias_zone_id
+    evaluate_target_health = var.alias_evaluate_target_health
+  }
+}
+
 resource "aws_acm_certificate_validation" "this" {
   count                   = var.enable_validation ? 1 : 0
   certificate_arn         = aws_acm_certificate.this.arn
