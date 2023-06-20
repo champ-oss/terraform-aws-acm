@@ -3,7 +3,7 @@ module github.com/champ-oss/terraform-aws-acm
 go 1.17
 
 require (
-	github.com/aws/aws-sdk-go v1.44.281
+	github.com/aws/aws-sdk-go v1.44.285
 	github.com/gruntwork-io/terratest v0.41.17
 	github.com/stretchr/testify v1.8.4
 )
