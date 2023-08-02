@@ -39,9 +39,3 @@ variable "create_wildcard" {
   type        = bool
   default     = true
 }
-
-variable "time_sleep" {
-  description = "Seconds to wait for certificate validation"
-  type        = number
-  default     = 30
-}
