@@ -1,3 +1,3 @@
 set -e
 
-aws acm describe-certificate --certificate-arn $ARN
+aws acm describe-certificate --certificate-arn $ARN | grep ISSUED
