@@ -1,13 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
-data "aws_region" "this" {}
-
-data "aws_route53_zone" "this" {
-  name = "oss.champtest.net."
-}
-
 locals {
   git = "terraform-aws-acm"
   tags = {
@@ -17,15 +7,43 @@ locals {
   }
 }
 
-module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc?ref=v1.0.50-a16c81b"
-  name                     = local.git
-  availability_zones_count = 2
-  retention_in_days        = 1
-  create_private_subnets   = false
+data "aws_route53_zone" "this" {
+  name = "oss.champtest.net."
 }
 
-module "with_validation" {
+data "aws_vpcs" "this" {
+  tags = {
+    purpose = "vega"
+  }
+}
+
+data "aws_subnets" "public" {
+  tags = {
+    purpose = "vega"
+    Type    = "Public"
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpcs.this.ids[0]]
+  }
+}
+
+resource "aws_security_group" "this" {
+  name_prefix = "terraform-aws-acm-"
+  vpc_id      = data.aws_vpcs.this.ids[0]
+  tags        = local.tags
+}
+
+resource "aws_lb" "this" {
+  name_prefix     = "lb-pb-"
+  security_groups = [aws_security_group.this.id]
+  subnets         = data.aws_subnets.public.ids
+  tags            = local.tags
+  internal        = false
+}
+
+module "this" {
   source            = "../../"
   depends_on        = [aws_lb.this]
   git               = local.git
@@ -35,36 +53,13 @@ module "with_validation" {
   enable_validation = true
 }
 
-module "no_validation" {
-  source            = "../../"
-  depends_on        = [aws_lb.this]
-  git               = local.git
-  domain_name       = data.aws_route53_zone.this.name
-  zone_id           = data.aws_route53_zone.this.zone_id
-  enable_validation = false
-}
-
-resource "aws_security_group" "this" {
-  name_prefix = "terraform-aws-acm-"
-  vpc_id      = module.vpc.vpc_id
-  tags        = local.tags
-}
-
-resource "aws_lb" "this" {
-  name_prefix     = "lb-pb-"
-  security_groups = [aws_security_group.this.id]
-  subnets         = module.vpc.public_subnets_ids
-  tags            = local.tags
-  internal        = false
-}
-
 resource "aws_lb_listener" "this" {
   load_balancer_arn = aws_lb.this.arn
   depends_on        = [aws_lb.this]
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = module.with_validation.arn
+  certificate_arn   = module.this.arn
 
   default_action {
     type = "fixed-response"
@@ -75,4 +70,9 @@ resource "aws_lb_listener" "this" {
       status_code  = "400"
     }
   }
+}
+
+output "arn" {
+  description = "Certificate ARN"
+  value       = module.this.arn
 }
