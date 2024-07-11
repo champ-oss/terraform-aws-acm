@@ -43,6 +43,12 @@ resource "aws_lb" "this" {
   internal        = false
 }
 
+variable "enabled" {
+  description = "module enabled"
+  type        = bool
+  default     = true
+}
+
 module "this" {
   source            = "../../"
   depends_on        = [aws_lb.this]
@@ -51,6 +57,7 @@ module "this" {
   create_wildcard   = false
   zone_id           = data.aws_route53_zone.this.zone_id
   enable_validation = true
+  enabled           = var.enabled
 }
 
 resource "aws_lb_listener" "this" {
@@ -75,4 +82,9 @@ resource "aws_lb_listener" "this" {
 output "arn" {
   description = "Certificate ARN"
   value       = module.this.arn
+}
+
+output "enabled" {
+  description = "module enabled"
+  value       = var.enabled
 }
