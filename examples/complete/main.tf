@@ -30,17 +30,25 @@ data "aws_subnets" "public" {
 }
 
 resource "aws_security_group" "this" {
+  count       = var.enabled ? 1 : 0
   name_prefix = "terraform-aws-acm-"
   vpc_id      = data.aws_vpcs.this.ids[0]
   tags        = local.tags
 }
 
 resource "aws_lb" "this" {
+    count           = var.enabled ? 1 : 0
   name_prefix     = "lb-pb-"
-  security_groups = [aws_security_group.this.id]
+  security_groups = [aws_security_group.this[0].id]
   subnets         = data.aws_subnets.public.ids
   tags            = local.tags
   internal        = false
+}
+
+variable "enabled" {
+  description = "module enabled"
+  type        = bool
+  default     = true
 }
 
 module "this" {
@@ -51,10 +59,12 @@ module "this" {
   create_wildcard   = false
   zone_id           = data.aws_route53_zone.this.zone_id
   enable_validation = true
+  enabled           = var.enabled
 }
 
 resource "aws_lb_listener" "this" {
-  load_balancer_arn = aws_lb.this.arn
+  count             = var.enabled ? 1 : 0
+  load_balancer_arn = aws_lb.this[0].arn
   depends_on        = [aws_lb.this]
   port              = "443"
   protocol          = "HTTPS"
@@ -75,4 +85,9 @@ resource "aws_lb_listener" "this" {
 output "arn" {
   description = "Certificate ARN"
   value       = module.this.arn
+}
+
+output "enabled" {
+  description = "module enabled"
+  value       = var.enabled
 }
