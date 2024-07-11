@@ -1,6 +1,6 @@
 locals {
   domain_name = var.create_wildcard ? "*.${var.domain_name}" : var.domain_name
-  cert_arn    = var.enable_validation ? aws_acm_certificate_validation.this[0].certificate_arn : aws_acm_certificate.this[0].arn
+  cert_arn    = var.enable_validation ? try(aws_acm_certificate_validation.this[0].certificate_arn, "") : try(aws_acm_certificate.this[0].arn, "")
 }
 
 resource "aws_acm_certificate" "this" {
