@@ -4,7 +4,7 @@ locals {
 }
 
 resource "aws_acm_certificate" "this" {
-  count = var.enabled ? 1 : 0
+  count             = var.enabled ? 1 : 0
   domain_name       = local.domain_name
   validation_method = "DNS"
   tags              = merge({ Name = var.git }, local.tags, var.tags)
