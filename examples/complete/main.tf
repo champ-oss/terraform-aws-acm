@@ -61,6 +61,7 @@ module "this" {
 }
 
 resource "aws_lb_listener" "this" {
+  count             = var.enabled ? 1 : 0
   load_balancer_arn = aws_lb.this.arn
   depends_on        = [aws_lb.this]
   port              = "443"
