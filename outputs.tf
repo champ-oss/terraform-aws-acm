@@ -4,6 +4,6 @@ output "arn" {
 }
 
 output "domain_name" {
-  description = "Certificate domain name"
+  description = "certificate domain name"
   value       = var.enabled ? try(aws_acm_certificate.this[0].domain_name, "") : ""
 }
